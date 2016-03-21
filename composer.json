@@ -5,7 +5,7 @@
     }
   },
   "license": "MIT",
-  "name": "douggr/benri",
+  "name": "rt7/benri",
   "require-dev": {
     "fabpot/php-cs-fixer": "~1"
   },
