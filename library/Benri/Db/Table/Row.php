@@ -394,9 +394,9 @@ class Benri_Db_Table_Row extends Zend_Db_Table_Row
         $bestMatchPercentage    = 0.00;
         $byRefPercentage        = 0.00;
         $columnThreshold        = 75;
-        $goodColumnNames        = $this->getTable()->info('cols');
+        $goodColumnNames        = $this->_data;
 
-        foreach ($goodColumnNames as $property) {
+        foreach ($goodColumnNames as $property => $value) {
             if ($badColumnName === ($lowerProperty =  strtolower($property))) {
                 return $property;
             }
