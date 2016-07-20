@@ -345,7 +345,7 @@ class Benri_Db_Table_Row extends Zend_Db_Table_Row
             return call_user_func_array([$this, $getter], []);
         }
 
-        return parent::__get($columnName);
+        return parent::__get($this->suggestPropertyName($columnName));
     }
 
     /**
@@ -361,7 +361,7 @@ class Benri_Db_Table_Row extends Zend_Db_Table_Row
             $value = call_user_func_array([$this, $setter], [$value]);
         }
 
-        return parent::__set($columnName, $value);
+        return parent::__set($this->suggestPropertyName($columnName), $value);
     }
 
     /**
@@ -382,5 +382,39 @@ class Benri_Db_Table_Row extends Zend_Db_Table_Row
         }
 
         return true;
+    }
+
+    /**
+     *
+     */
+    private function suggestPropertyName($badColumnName)
+    {
+        $badColumnName          = strtolower($badColumnName);
+        $bestMatch              = '';
+        $bestMatchPercentage    = 0.00;
+        $byRefPercentage        = 0.00;
+        $columnThreshold        = 75;
+        $goodColumnNames        = $this->getTable()->info('cols');
+
+        foreach ($goodColumnNames as $property) {
+            if ($badColumnName === ($lowerProperty =  strtolower($property))) {
+                return $property;
+            }
+
+            similar_text($badColumnName, $lowerProperty, $byRefPercentage);
+
+            if ($byRefPercentage > $bestMatchPercentage) {
+                $bestMatch              = $property;
+                $bestMatchPercentage    = $byRefPercentage;
+            }
+        }
+
+        if ($bestMatchPercentage >= $columnThreshold) {
+            return $bestMatch;
+        }
+
+        throw new Zend_Db_Table_Row_Exception(
+            "Specified column \"$badColumnName\" is not in the row"
+        );
     }
 }
